@@ -1,93 +1,485 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import logo from '../assets/DecodeXtreme Logo.webp';
-import fallbackLogo from '../assets/logo.png';
-import { FastForward } from 'lucide-react';
 
 const Preloader = ({ onComplete }) => {
   const containerRef = useRef(null);
+  const canvasRef = useRef(null);
+  const wipeRef = useRef(null);
+  const hudRef = useRef(null);
+
   const [count, setCount] = useState(0);
+  const [phaseIdx, setPhaseIdx] = useState(0);
+
+  const phaseLabels = [
+    {
+      phase: '01 / DNA SIGNAL ACQUISITION',
+      detail: 'Searching encoded memory fragments...',
+      tag: 'ACQUIRING SIGNAL'
+    },
+    {
+      phase: '02 / STRAND ALIGNMENT',
+      detail: 'Rebuilding sequence structure...',
+      tag: 'MAPPING STRANDS'
+    },
+    {
+      phase: '03 / CIPHER DECRYPTION',
+      detail: 'Resolving encrypted memory sectors...',
+      tag: 'DECODING ARCHIVE'
+    },
+    {
+      phase: '04 / FULL SYNCHRONIZATION',
+      detail: 'Memory reconstruction complete.',
+      tag: 'SYNCHRONIZING'
+    }
+  ];
 
   useLayoutEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline();
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-      const counterObj = { value: 0 };
+    let W = 0;
+    let H = 0;
+    let dpr = 1;
+    let now = 0;
+    let raf = 0;
+    let finished = false;
+
+    const visual = {
+      speed: 1,
+      spread: 1,
+      resolve: 0,
+      glow: 0.65,
+      disperse: 0,
+      turn: 0
+    };
+
+    const resize = () => {
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = window.innerWidth;
+      H = window.innerHeight;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      canvas.style.width = `${W}px`;
+      canvas.style.height = `${H}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+
+    const fract = (x) => x - Math.floor(x);
+    const rnd = (x) => fract(Math.sin(x * 127.1 + 78.233) * 43758.5453123);
+
+    // Horizontal DNA Double Helix strand calculation
+    const strand = (t, s) => {
+      const cycles = W > 768 ? 3 : 2;
+      const ph = t * Math.PI * cycles + now * 0.42 + visual.turn;
+      const rad = Math.cos(ph);
+      const scale = Math.min(W / 1200, H / 760, 1.5);
+      const A = Math.min(125, Math.max(50, H * 0.16)) * visual.spread;
+      const perspective = 0.68 + (0.32 * (rad + 1)) / 2;
+
+      return {
+        // x spans horizontally across screen width with edge bleed
+        x: W * 0.5 + t * (W * 0.52),
+        // y oscillates vertically around center
+        y: H * 0.5 + Math.sin(ph) * A * s * perspective,
+        z: rad * s,
+        scale,
+        perspective
+      };
+    };
+
+    const draw = () => {
+      now += 0.012 * visual.speed;
+      ctx.clearRect(0, 0, W, H);
+
+      // Radial Animus depth atmosphere
+      const g = ctx.createRadialGradient(W * 0.5, H * 0.5, 10, W * 0.5, H * 0.5, Math.max(W, H) * 0.58);
+      g.addColorStop(0, 'rgba(8, 209, 216, 0.09)');
+      g.addColorStop(0.55, 'rgba(4, 9, 14, 0.45)');
+      g.addColorStop(1, 'rgba(2, 4, 7, 0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+
+      // Compute DNA nodes along horizontal span
+      const count = Math.min(220, Math.max(100, Math.floor(W / 6.5)));
+      const DNA = [];
+      for (let i = 0; i < count; i++) {
+        const t = (i / (count - 1) - 0.5) * 2;
+        const a = strand(t, 1);
+        const b = strand(t, -1);
+        DNA.push([a, b, t]);
+      }
+
+      // Density fog: floating Animus memory dust particles
+      for (let i = 0; i < 200; i++) {
+        const q = rnd(i * 3.3);
+        const r = rnd(i * 4.9);
+        const u = rnd(i * 8.2);
+        const y = fract(r + now * (0.002 + 0.003 * u)) * H;
+        const x = fract(q + Math.sin(now * 0.18 + i) * 0.008) * W;
+        const dx = (x - W / 2) / (W / 2);
+        const dy = (y - H / 2) / (H / 2);
+        const opacity = (0.07 + 0.28 * (1 - Math.min(1, Math.sqrt(dx * dx + dy * dy)))) * (0.4 + visual.glow * 0.6);
+
+        ctx.fillStyle =
+          i % 6 === 0
+            ? `rgba(8, 209, 216, ${opacity * 0.9})`
+            : i % 13 === 0
+            ? `rgba(239, 68, 68, ${opacity * 0.8})`
+            : `rgba(160, 195, 210, ${opacity * 0.5})`;
+        ctx.beginPath();
+        ctx.arc(x, y, 0.4 + u * 1.3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Connecting horizontal base-pair rungs
+      for (let i = 1; i < count; i += 2) {
+        const [a, b, t] = DNA[i];
+        const near = Math.max(0, Math.cos(t * Math.PI * 0.5) * 0.35 + 0.65);
+        const depth = (a.z + 1) / 2;
+        const alpha = (0.12 + 0.42 * depth) * near * (1 - visual.disperse);
+
+        const grad = ctx.createLinearGradient(a.x, a.y, b.x, b.y);
+        grad.addColorStop(0, `rgba(8, 209, 216, ${alpha})`);
+        grad.addColorStop(0.5, `rgba(180, 230, 245, ${alpha * 0.75})`);
+        grad.addColorStop(1, `rgba(239, 68, 68, ${alpha})`);
+
+        ctx.beginPath();
+        ctx.moveTo(a.x, a.y);
+        ctx.lineTo(b.x, b.y);
+        ctx.lineWidth = 0.85;
+        ctx.strokeStyle = grad;
+        ctx.stroke();
+      }
+
+      // Dual strands as long continuous ribbons (Strand 0 = Cyan, Strand 1 = Crimson)
+      for (let s = 0; s < 2; s++) {
+        for (let pass = 0; pass < 3; pass++) {
+          ctx.beginPath();
+          for (let i = 0; i < count; i++) {
+            const p = DNA[i][s];
+            const j = pass - 1;
+            const x = p.x;
+            const y = p.y + j * (1.8 + Math.abs(p.z) * 2.8);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+
+          if (s === 0) {
+            // Cyan strand
+            ctx.strokeStyle =
+              pass === 1
+                ? `rgba(8, 209, 216, ${0.45 + 0.45 * visual.glow})`
+                : `rgba(0, 242, 254, ${0.12 * visual.glow})`;
+            ctx.lineWidth = pass === 1 ? 1.8 : 3.4;
+          } else {
+            // Crimson strand
+            ctx.strokeStyle =
+              pass === 1
+                ? `rgba(239, 68, 68, ${0.45 + 0.45 * visual.glow})`
+                : `rgba(220, 38, 38, ${0.12 * visual.glow})`;
+            ctx.lineWidth = pass === 1 ? 1.8 : 3.4;
+          }
+          ctx.stroke();
+        }
+      }
+
+      // Genomic data pixels (Base nodes)
+      for (let i = 0; i < count; i += 2) {
+        const [a, b, t] = DNA[i];
+        for (let s = 0; s < 2; s++) {
+          const p = s ? b : a;
+          const z = Math.max(0, (p.z + 1) / 2);
+          const fade = Math.pow(Math.max(0, 1 - Math.pow(Math.abs(t), 2)), 0.4);
+          const n = rnd(i * 19 + s * 7);
+          const alpha = (0.2 + 0.75 * z) * fade * (0.4 + visual.glow * 0.6);
+          const size = 1.2 + 2.8 * z;
+
+          ctx.fillStyle = s === 0 ? `rgba(8, 209, 216, ${alpha})` : `rgba(239, 68, 68, ${alpha})`;
+          ctx.fillRect(p.x - size / 2, p.y - size / 2, size, size);
+
+          if (n > 0.88) {
+            ctx.strokeStyle = s === 0 ? `rgba(8, 209, 216, ${alpha * 0.55})` : `rgba(239, 68, 68, ${alpha * 0.55})`;
+            ctx.lineWidth = 0.75;
+            ctx.beginPath();
+            ctx.moveTo(p.x, p.y - 7);
+            ctx.lineTo(p.x, p.y + 7);
+            ctx.stroke();
+          }
+        }
+      }
+
+      // Horizontal ghost filaments (peeling genetic data streamers)
+      for (let i = 0; i < 160; i++) {
+        const t = rnd(i * 4.19) * 2 - 1;
+        const side = i % 2 ? 1 : -1;
+        const p = strand(t, side);
+        const driftX = (rnd(i * 8.4) - 0.5) * 160 * (0.5 + visual.disperse * 3);
+        const driftY = (rnd(i * 6.22) - 0.5) * 45;
+        const x = p.x + driftX;
+        const y = p.y + driftY;
+        const alpha = (0.07 + 0.28 * rnd(i * 9.2)) * (1 - Math.abs(t) * 0.65) * (1 - visual.disperse * 0.4);
+
+        ctx.fillStyle = i % 8 === 0 ? `rgba(239, 68, 68, ${alpha})` : `rgba(8, 209, 216, ${alpha})`;
+        const len = i % 4 === 0 ? 11 : 3.5;
+        ctx.fillRect(x - len / 2, y, len, 0.85);
+      }
+
+      raf = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    // GSAP Timeline for progression
+    let tl = gsap.timeline({ delay: 0.2 });
+
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+
+      const endTl = gsap.timeline();
+      endTl
+        .to(visual, {
+          spread: 0.02,
+          speed: 2.5,
+          disperse: 1,
+          glow: 1.6,
+          duration: 0.7,
+          ease: 'power3.inOut'
+        })
+        .to(hudRef.current, {
+          opacity: 0,
+          scale: 0.98,
+          duration: 0.35,
+          ease: 'power2.in'
+        }, '<+0.1')
+        .to(wipeRef.current, {
+          opacity: 0.85,
+          duration: 0.16,
+          ease: 'power2.in'
+        }, '-=0.1')
+        .to(containerRef.current, {
+          opacity: 0,
+          duration: 0.4,
+          ease: 'power2.out',
+          onComplete: () => {
+            if (onComplete) onComplete();
+          }
+        }, '<+0.15');
+    };
+
+    // Store finish handler on container for Skip button
+    if (containerRef.current) {
+      containerRef.current.__finish = () => {
+        if (tl) tl.kill();
+        finish();
+      };
+    }
+
+    const counterObj = { value: 0 };
+    const stepDuration = 0.55;
+
+    phaseLabels.forEach((label, i) => {
+      tl.call(() => {
+        setPhaseIdx(i);
+      });
+
       tl.to(counterObj, {
-        value: 100,
-        duration: 1.8,
-        ease: 'power2.out',
+        value: (i + 1) * 25,
+        duration: stepDuration,
+        ease: 'power1.inOut',
         onUpdate: () => {
           setCount(Math.round(counterObj.value));
         }
       });
 
-      tl.to('.preloader-content', {
-        opacity: 0,
-        y: -30,
-        duration: 0.4,
-        ease: 'power2.in'
-      });
+      tl.to(
+        visual,
+        {
+          speed: 1.15 + i * 0.15,
+          glow: 0.65 + i * 0.12,
+          spread: 1 + i * 0.06,
+          turn: (i + 1) * 0.2,
+          duration: stepDuration,
+          ease: 'sine.inOut'
+        },
+        '<'
+      );
 
-      tl.to(containerRef.current, {
-        yPercent: -100,
-        duration: 0.8,
-        ease: 'power4.inOut',
-        onComplete: onComplete
-      });
-    }, containerRef);
+      tl.to({}, { duration: 0.08 });
+    });
 
-    return () => ctx.revert();
+    tl.call(finish);
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(raf);
+      if (tl) tl.kill();
+      gsap.killTweensOf(visual);
+    };
   }, [onComplete]);
+
+  const handleSkip = () => {
+    if (containerRef.current && containerRef.current.__finish) {
+      containerRef.current.__finish();
+    } else if (onComplete) {
+      onComplete();
+    }
+  };
+
+  const activePhase = phaseLabels[phaseIdx] || phaseLabels[0];
 
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-[1000] bg-[#040608] text-white flex flex-col items-center justify-center p-6 bg-cyber-grid"
+      className="fixed inset-0 z-[1000] overflow-hidden bg-[#03060a] text-white select-none"
     >
-      <div className="preloader-content flex flex-col items-center text-center max-w-md w-full">
-        {/* Animus Logo Mark */}
-        <div className="mb-6 relative">
-          <img
-            src={logo}
-            onError={(e) => { e.currentTarget.src = fallbackLogo; }}
-            alt="DecodeXtreme Logo"
-            className="h-14 w-auto object-contain filter drop-shadow-[0_0_20px_rgba(0,242,254,0.5)]"
-          />
-        </div>
+      {/* Horizontal DNA Canvas */}
+      <canvas
+        ref={canvasRef}
+        aria-label="Animated horizontal DNA memory helix"
+        className="absolute inset-0 w-full h-full block z-10 pointer-events-none"
+      />
 
-        {/* Telemetry status */}
-        <div className="flex items-center gap-2 mb-4 font-mono text-xs uppercase tracking-widest text-[var(--color-primary)]">
-          <span className="w-2 h-2 rounded-full bg-[var(--color-primary)] animate-ping" />
-          <span>ANIMUS SYNCHRONIZATION IN PROGRESS</span>
-        </div>
+      {/* Animus Noise Grain */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-25 z-20"
+        style={{
+          backgroundImage:
+            'url("data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'n\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'.72\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23n)\' opacity=\'.14\'/%3E%3C/svg%3E")'
+        }}
+      />
 
-        {/* Big Counter */}
-        <div className="font-display font-black text-8xl md:text-9xl tabular-nums tracking-tighter text-white mb-6">
-          {count}<span className="text-3xl text-[var(--color-primary)]">%</span>
-        </div>
+      {/* Cyber Scanline Overlay */}
+      <div
+        className="absolute inset-0 pointer-events-none z-20"
+        style={{
+          background: 'repeating-linear-gradient(0deg, transparent 0 4px, rgba(8, 209, 216, 0.02) 5px 6px)'
+        }}
+      />
 
-        {/* DNA Sync Progress Bar */}
-        <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden mb-8">
+      {/* HUD Telemetry Frame */}
+      <div ref={hudRef} className="absolute inset-0 z-30 flex flex-col justify-between p-6 md:p-10 pointer-events-none">
+        {/* Top Header */}
+        <header className="flex justify-between items-start text-[10px] tracking-[0.2em] font-mono text-cyan-200/60">
+          <div>
+            <div className="font-hud font-bold text-base md:text-lg tracking-[0.16em] text-white flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#08d1d8] animate-ping" />
+              <span>ANIMUS // NEURAL INTERFACE</span>
+            </div>
+            <div className="text-[10px] text-gray-400 mt-1 tracking-widest">
+              IEEE PRE-XTREME // SESSION 0004
+            </div>
+          </div>
+
+          <div className="text-right leading-relaxed text-[10px] hidden sm:block">
+            <div>
+              GENETIC ARCHIVE: <span className="text-[#08d1d8] font-semibold">ONLINE</span>
+            </div>
+            <div className="text-gray-400">MEMORY INTEGRITY: SYNCHRONIZING</div>
+            <div className="text-gray-500">RECONSTRUCTION PROTOCOL</div>
+          </div>
+        </header>
+
+        {/* Left Side Rail: Sequence Analysis */}
+        <div className="absolute top-1/2 left-6 md:left-10 -translate-y-1/2 hidden md:flex items-center gap-3 pointer-events-none">
           <div
-            className="h-full bg-gradient-to-r from-[var(--color-primary)] to-white transition-all duration-100"
-            style={{ width: `${count}%` }}
+            className="h-44 w-2 opacity-50"
+            style={{
+              background: 'repeating-linear-gradient(to bottom, #08d1d8 0 1px, transparent 1px 11px)'
+            }}
           />
+          <div className="font-mono text-[9px] tracking-[0.28em] text-gray-400 [writing-mode:vertical-rl] rotate-180">
+            SEQUENCE ANALYSIS / GENETIC CODE
+          </div>
         </div>
 
-        {/* Skip Intro Button */}
-        <button
-          onClick={onComplete}
-          className="flex items-center gap-2 px-5 py-2 rounded-full border border-white/20 text-xs font-mono uppercase tracking-wider text-gray-400 hover:text-white hover:border-[var(--color-primary)] transition-all cursor-pointer"
-        >
-          <span>Skip Intro</span>
-          <FastForward size={14} />
-        </button>
+        {/* Center Loading Information */}
+        <section className="self-center text-center max-w-lg w-full px-4">
+          {/* Status Tag */}
+          <div className="font-mono text-[10px] tracking-[0.38em] text-[#08d1d8] uppercase mb-2">
+            [ {activePhase.tag} ]
+          </div>
+
+          {/* Subtitle */}
+          <div className="font-hud text-xs md:text-sm tracking-[0.28em] uppercase text-gray-300 font-medium">
+            GENETIC SEQUENCE RECONSTRUCTION
+          </div>
+
+          {/* Progress Percentage Display */}
+          <div className="font-hud text-7xl md:text-9xl font-bold tracking-tight text-white my-2 md:my-4 tabular-nums drop-shadow-[0_0_25px_rgba(8,209,216,0.35)]">
+            {String(count).padStart(3, '0')}
+            <span className="text-3xl md:text-4xl text-[#08d1d8] ml-1 font-semibold">%</span>
+          </div>
+
+          {/* Current Phase */}
+          <div className="font-mono text-xs tracking-[0.25em] text-cyan-100 uppercase min-h-[20px]">
+            {activePhase.phase}
+          </div>
+
+          {/* Phase Detail */}
+          <div className="font-mono text-[10px] tracking-[0.12em] text-gray-400 mt-1 min-h-[20px]">
+            {activePhase.detail}
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-64 max-w-full h-[2px] bg-white/15 mx-auto mt-5 overflow-hidden rounded-full">
+            <div
+              className="h-full bg-gradient-to-r from-[#08d1d8] via-[#00f2fe] to-white shadow-[0_0_10px_#08d1d8] transition-all duration-75"
+              style={{ width: `${count}%` }}
+            />
+          </div>
+        </section>
+
+        {/* Bottom Phase List and Skip Button */}
+        <footer className="flex flex-col sm:flex-row items-center sm:items-end justify-between text-[10px] font-mono tracking-[0.16em] text-gray-400 gap-4">
+          <div className="flex gap-4 md:gap-6 flex-wrap justify-center sm:justify-start">
+            {['01 / ACQUISITION', '02 / ALIGNMENT', '03 / DECRYPTION', '04 / SYNCHRONIZATION'].map((step, idx) => (
+              <span
+                key={step}
+                className={`relative pt-3 transition-all duration-300 ${
+                  phaseIdx === idx
+                    ? 'text-[#08d1d8] font-semibold opacity-100'
+                    : phaseIdx > idx
+                    ? 'text-cyan-200/70 opacity-80'
+                    : 'opacity-35 text-gray-500'
+                }`}
+              >
+                <span
+                  className={`absolute top-0 left-0 w-full h-[2px] transition-colors duration-300 ${
+                    phaseIdx >= idx ? 'bg-[#08d1d8]' : 'bg-white/20'
+                  }`}
+                />
+                {step}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <span className="hidden lg:inline text-[9px] tracking-[0.2em] text-gray-500">
+              ANIMUS MEMORY ARCHIVE · SESSION SYNC
+            </span>
+            <button
+              type="button"
+              onClick={handleSkip}
+              className="pointer-events-auto border border-white/25 hover:border-[#08d1d8] text-gray-300 hover:text-white px-4 py-1.5 rounded text-[10px] tracking-[0.18em] uppercase transition-all duration-200 bg-black/40 hover:bg-[#08d1d8]/10 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>SKIP INTRO</span>
+              <span className="text-[#08d1d8]">↗</span>
+            </button>
+          </div>
+        </footer>
       </div>
 
-      <div className="absolute bottom-6 font-mono text-[10px] text-gray-600 tracking-widest uppercase">
-        IEEE SB OF SLTC · IEEEXTREME 20.0 PREPARATION
-      </div>
+      {/* Animus Desynchronization / Flash Wipe Overlay */}
+      <div
+        ref={wipeRef}
+        className="absolute inset-0 bg-white pointer-events-none opacity-0 z-40 transition-opacity"
+      />
     </div>
   );
 };
