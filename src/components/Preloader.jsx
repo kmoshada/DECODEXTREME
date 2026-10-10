@@ -1,6 +1,29 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
 
+const PHASE_LABELS = [
+  {
+    phase: '01 / DNA SIGNAL ACQUISITION',
+    detail: 'Searching encoded memory fragments...',
+    tag: 'ACQUIRING SIGNAL'
+  },
+  {
+    phase: '02 / STRAND ALIGNMENT',
+    detail: 'Rebuilding sequence structure...',
+    tag: 'MAPPING STRANDS'
+  },
+  {
+    phase: '03 / CIPHER DECRYPTION',
+    detail: 'Resolving encrypted memory sectors...',
+    tag: 'DECODING ARCHIVE'
+  },
+  {
+    phase: '04 / FULL SYNCHRONIZATION',
+    detail: 'Memory reconstruction complete.',
+    tag: 'SYNCHRONIZING'
+  }
+];
+
 const Preloader = ({ onComplete }) => {
   const containerRef = useRef(null);
   const canvasRef = useRef(null);
@@ -9,29 +32,6 @@ const Preloader = ({ onComplete }) => {
 
   const [count, setCount] = useState(0);
   const [phaseIdx, setPhaseIdx] = useState(0);
-
-  const phaseLabels = [
-    {
-      phase: '01 / DNA SIGNAL ACQUISITION',
-      detail: 'Searching encoded memory fragments...',
-      tag: 'ACQUIRING SIGNAL'
-    },
-    {
-      phase: '02 / STRAND ALIGNMENT',
-      detail: 'Rebuilding sequence structure...',
-      tag: 'MAPPING STRANDS'
-    },
-    {
-      phase: '03 / CIPHER DECRYPTION',
-      detail: 'Resolving encrypted memory sectors...',
-      tag: 'DECODING ARCHIVE'
-    },
-    {
-      phase: '04 / FULL SYNCHRONIZATION',
-      detail: 'Memory reconstruction complete.',
-      tag: 'SYNCHRONIZING'
-    }
-  ];
 
   useLayoutEffect(() => {
     const canvas = canvasRef.current;
@@ -197,7 +197,7 @@ const Preloader = ({ onComplete }) => {
     draw();
 
     // GSAP Timeline for progression
-    let tl = gsap.timeline({ delay: 0.2 });
+    let tl = gsap.timeline({ delay: 0.1 });
 
     const finish = () => {
       if (finished) return;
@@ -210,23 +210,23 @@ const Preloader = ({ onComplete }) => {
           speed: 2.5,
           disperse: 1,
           glow: 1.6,
-          duration: 0.7,
+          duration: 0.45,
           ease: 'power3.inOut'
         })
         .to(hudRef.current, {
           opacity: 0,
           scale: 0.98,
-          duration: 0.35,
+          duration: 0.2,
           ease: 'power2.in'
         }, '<+0.1')
         .to(wipeRef.current, {
           opacity: 0.95,
-          duration: 0.12,
+          duration: 0.08,
           ease: 'power2.in'
         }, '-=0.08')
         .to(containerRef.current, {
           opacity: 0,
-          duration: 0.16,
+          duration: 0.1,
           ease: 'power2.out',
           onStart: () => {
             if (onComplete) onComplete();
@@ -243,9 +243,9 @@ const Preloader = ({ onComplete }) => {
     }
 
     const counterObj = { value: 0 };
-    const stepDuration = 0.55;
+    const stepDuration = 0.38;
 
-    phaseLabels.forEach((label, i) => {
+    PHASE_LABELS.forEach((label, i) => {
       tl.call(() => {
         setPhaseIdx(i);
       });
@@ -272,7 +272,7 @@ const Preloader = ({ onComplete }) => {
         '<'
       );
 
-      tl.to({}, { duration: 0.08 });
+      tl.to({}, { duration: 0.03 });
     });
 
     tl.call(finish);
@@ -293,7 +293,7 @@ const Preloader = ({ onComplete }) => {
     }
   };
 
-  const activePhase = phaseLabels[phaseIdx] || phaseLabels[0];
+  const activePhase = PHASE_LABELS[phaseIdx] || PHASE_LABELS[0];
 
   return (
     <div

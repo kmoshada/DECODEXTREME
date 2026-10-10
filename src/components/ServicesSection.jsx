@@ -5,20 +5,55 @@ import { MoveRight, Video, Code2, Users, Trophy, CheckCircle2 } from 'lucide-rea
 
 gsap.registerPlugin(ScrollTrigger);
 
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+const scrambleText = (element, duration = 0.65) => {
+  if (!element) return;
+
+  gsap.killTweensOf(element);
+
+  const finalText = element.dataset.programOriginalText || element.textContent;
+  element.dataset.programOriginalText = finalText;
+  const letters = [...finalText];
+  let frame = 0;
+
+  gsap.to(element, {
+    duration,
+    ease: 'power2.out',
+    onUpdate: function updateScramble() {
+      const progress = this.progress();
+      const cursor = Math.min(
+        letters.length,
+        Math.floor(progress * (letters.length + 2)),
+      );
+      frame += 1;
+      const nextText = letters
+        .map((character, index) => {
+          if (!/[A-Za-z0-9]/.test(character)) return character;
+          if (index < cursor || progress === 1) return character;
+          if (index < cursor + 2) {
+            return SCRAMBLE_CHARS[(index * 7 + frame) % SCRAMBLE_CHARS.length];
+          }
+          return character;
+        })
+        .join('');
+
+      element.textContent = nextText;
+    },
+    onComplete: () => { element.textContent = finalText; },
+  });
+};
+
 const SESSIONS = [
   {
     id: 'awareness',
     date: '12 OCT 2026',
     num: '01',
     title: 'Awareness Session',
-    subtitle: 'DISCOVER THE PATHWAY',
-    desc: 'An in-depth introduction to IEEEXtreme 20.0, competitive programming standards, preparation roadmaps, and local event expectations.',
-    time: '8:00 PM – 10:00 PM (SLT)',
+    desc: 'Introduction to IEEEXtreme 20.0, preparation roadmaps, and local event expectations.',
+    time: '8:00 PM – 10:00 PM (SLTC)',
     platform: 'Zoom Online',
-    eligibility: 'Open to Everyone Worldwide',
     icon: Video,
-    image: '',
-    imageLabel: 'BACKGROUND IMAGE / AWARENESS',
     accent: 'var(--color-primary)',
     isChallenge: false,
   },
@@ -27,14 +62,10 @@ const SESSIONS = [
     date: '14 OCT 2026',
     num: '02',
     title: 'Programming Fundamentals',
-    subtitle: 'ALGORITHMS & PROBLEM SOLVING',
-    desc: 'Hands-on decomposition of programming challenges, core algorithms, edge-case testing, and live debugging tactics on contest platforms.',
-    time: '8:00 PM – 10:00 PM (SLT)',
+    desc: 'Core algorithms, problem decomposition, edge-case testing, and live debugging tactics.',
+    time: '8:00 PM – 10:00 PM (SLTC)',
     platform: 'Zoom Online',
-    eligibility: 'Open to Everyone Worldwide',
     icon: Code2,
-    image: '',
-    imageLabel: 'BACKGROUND IMAGE / FUNDAMENTALS',
     accent: 'var(--color-primary)',
     isChallenge: false,
   },
@@ -43,14 +74,10 @@ const SESSIONS = [
     date: '21 OCT 2026',
     num: '03',
     title: 'Advanced Strategy',
-    subtitle: 'TEAMWORK & TIME TRIAGE',
-    desc: 'Formulate your team game plan. Triage problems efficiently, manage sub-task dispatching, avoid contest traps, and preserve mental endurance.',
-    time: '8:00 PM – 10:00 PM (SLT)',
+    desc: 'Team planning, problem triage, task dispatching, and contest-time management.',
+    time: '8:00 PM – 10:00 PM (SLTC)',
     platform: 'Zoom Online',
-    eligibility: 'Open to Everyone Worldwide',
     icon: Users,
-    image: '',
-    imageLabel: 'BACKGROUND IMAGE / STRATEGY',
     accent: 'var(--color-primary)',
     isChallenge: false,
   },
@@ -59,14 +86,10 @@ const SESSIONS = [
     date: '24 OCT 2026',
     num: '04',
     title: 'PreXtreme Team Battle',
-    subtitle: '9-HOUR HACKERRANK CHALLENGE',
-    desc: 'The defining arena. Exactly three SLTC undergraduates compete side-by-side in a nine-hour coding sprint with live leaderboard scoring.',
+    desc: 'A nine-hour coding sprint for teams of three with live leaderboard scoring.',
     time: '8:00 AM Check-in · 9:00 AM – 6:00 PM Coding',
     platform: 'HackerRank Arena',
-    eligibility: 'SLTC Undergraduates Only (Teams of 3)',
     icon: Trophy,
-    image: '',
-    imageLabel: 'BACKGROUND IMAGE / PREXTREME',
     accent: '#ff334b',
     isChallenge: true,
   },
@@ -83,22 +106,33 @@ const toggleOnScroll = (trigger, start = 'top 85%') => ({
 });
 
 // One panel: a curtain wipe, then its content rises in a short stagger.
-const revealPanel = (panel, vars = {}) => {
+const revealPanel = (panel, { mobile = false, ...vars } = {}) => {
   const items = panel.querySelectorAll('.prog-panel-item');
+  const panelStart = mobile
+    ? { clipPath: CLIP_HIDDEN, y: 24 }
+    : { clipPath: CLIP_HIDDEN, y: 48 };
+  const panelEnd = mobile
+    ? { clipPath: CLIP_SHOWN, y: 0, duration: 0.7, ease: 'power4.inOut' }
+    : { clipPath: CLIP_SHOWN, y: 0, duration: 0.9, ease: 'power4.inOut' };
 
   return gsap
     .timeline({ defaults: { ease: 'power3.out' }, ...vars })
     .fromTo(
       panel,
-      { clipPath: CLIP_HIDDEN, y: 48 },
-      { clipPath: CLIP_SHOWN, y: 0, duration: 0.9, ease: 'power4.inOut' },
+      panelStart,
+      panelEnd,
       0,
     )
     .fromTo(
       items,
-      { autoAlpha: 0, y: 24 },
-      { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.07 },
-      0.35,
+      { autoAlpha: 0, y: mobile ? 14 : 24 },
+      {
+        autoAlpha: 1,
+        y: 0,
+        duration: mobile ? 0.45 : 0.6,
+        stagger: mobile ? 0.05 : 0.07,
+      },
+      mobile ? 0.25 : 0.35,
     );
 };
 
@@ -156,16 +190,47 @@ const buildPanelsScrubbed = (section, q) => {
       .fromTo(
         items,
         { autoAlpha: 0, y: 24 },
-        { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.07 },
+        {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.6,
+          stagger: 0.07,
+        },
         at + 0.35,
       );
   });
 };
 
+const observeCardScrambles = (section) => {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+
+        entry.target
+          .querySelectorAll('[data-program-scramble]')
+          .forEach((target, index) => {
+            window.setTimeout(() => scrambleText(target, 1 + index * 0.08), index * 80);
+          });
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.18, rootMargin: '0px 0px -10% 0px' },
+  );
+
+  section.querySelectorAll('.prog-panel').forEach((panel) => observer.observe(panel));
+  return observer;
+};
+
 // TABLET / MOBILE: each panel reveals as it enters and reverses when scrolled back up.
 const buildPanelsFlow = (q) => {
   q('.prog-panel').forEach((panel) => {
-    revealPanel(panel, { scrollTrigger: toggleOnScroll(panel, 'top 82%') });
+    revealPanel(panel, {
+      mobile: true,
+      scrollTrigger: toggleOnScroll(panel, 'top 88%'),
+    });
   });
 };
 
@@ -178,6 +243,7 @@ const ServicesSection = ({ onOpenRegister }) => {
 
     const q = gsap.utils.selector(section);
     let disposed = false;
+    const cardObserver = observeCardScrambles(section);
 
     const ctx = gsap.context(() => {
       const mm = gsap.matchMedia();
@@ -217,6 +283,7 @@ const ServicesSection = ({ onOpenRegister }) => {
 
     return () => {
       disposed = true;
+      cardObserver?.disconnect();
       ctx.revert();
     };
   }, []);
@@ -251,90 +318,65 @@ const ServicesSection = ({ onOpenRegister }) => {
           </p>
         </div>
 
-        {/* Replace each image placeholder with a background asset by filling `image` in SESSIONS. */}
-        <div className="prog-panels grid grid-cols-1 gap-px sm:grid-cols-2 lg:grid-cols-4">
+        <div className="prog-panels grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-px lg:grid-cols-4">
           {SESSIONS.map((item) => {
             const Icon = item.icon;
             return (
               <article
                 key={item.id}
-                className="prog-panel group relative flex min-h-128 flex-col justify-end overflow-hidden p-5 sm:min-h-144 lg:min-h-156"
+                className="prog-panel group relative flex min-h-96 flex-col justify-end overflow-hidden p-5 sm:min-h-112 lg:min-h-128"
                 style={{
-                  backgroundColor: item.isChallenge ? '#1d0911' : '#081922',
+                  backgroundColor: item.isChallenge ? '#fff1f2' : '#ffffff',
                   '--panel-accent': item.accent,
                 }}
               >
-                {item.image && (
-                  <img
-                    src={item.image}
-                    alt=""
-                    aria-hidden="true"
-                    className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"
-                  />
-                )}
-
                 {/* Accent glow */}
                 <div
                   aria-hidden="true"
                   className="absolute inset-0 opacity-80 transition-transform duration-700 group-hover:scale-110"
                   style={{
-                    background: `radial-gradient(circle at 65% 20%, color-mix(in srgb, ${item.accent} 28%, transparent), transparent 40%), linear-gradient(135deg, rgba(255,255,255,0.06), transparent 55%)`,
+                    background: `radial-gradient(circle at 65% 20%, color-mix(in srgb, ${item.accent} 18%, transparent), transparent 40%), linear-gradient(135deg, rgba(255,255,255,0.7), transparent 55%)`,
                   }}
                 />
 
                 {/* Legibility gradient: keeps text readable with or without a background image */}
                 <div
                   aria-hidden="true"
-                  className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.12)_10%,rgba(0,0,0,0.68)_95%)]"
+                  className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.08)_10%,rgba(244,250,251,0.94)_95%)]"
                 />
 
                 {/* Frame */}
                 <div
                   aria-hidden="true"
-                  className="absolute inset-4 border border-white/15 transition-all duration-500 group-hover:inset-3 group-hover:border-(--panel-accent)/70"
+                  className="absolute inset-4 border border-slate-900/12 transition-all duration-500 group-hover:inset-3 group-hover:border-(--panel-accent)/70"
                 />
 
-                <div className="absolute inset-x-5 top-5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-white/60">
+                <div className="absolute inset-x-5 top-5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-slate-500">
                   <span>Phase {item.num}</span>
                   {item.isChallenge && <span style={{ color: item.accent }}>Final challenge</span>}
                 </div>
 
-                {!item.image && (
-                  <div
-                    aria-hidden="true"
-                    className="absolute left-1/2 top-1/3 w-4/5 -translate-x-1/2 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-white/45"
-                  >
-                    <div className="mx-auto mb-3 h-px w-12 bg-white/40" />
-                    {item.imageLabel}
-                  </div>
-                )}
-
                 <div className="relative z-10">
                   <div className="prog-panel-item mb-3 flex items-center gap-2">
                     <Icon size={16} style={{ color: item.accent }} aria-hidden="true" />
-                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/70">{item.date}</span>
+                    <span data-program-scramble className="font-mono text-[10px] uppercase tracking-[0.14em] text-slate-500">{item.date}</span>
                   </div>
 
-                  <h3 className="prog-panel-item mb-1 font-display text-2xl font-bold uppercase leading-[0.92] text-white transition-colors duration-300 group-hover:text-(--panel-accent)">
+                  <h3 data-program-scramble className="prog-panel-item mb-1 font-display text-2xl font-bold uppercase leading-[0.92] text-[#081922] transition-colors duration-300 group-hover:text-(--panel-accent)">
                     {item.title}
                   </h3>
-                  <p className="prog-panel-item mb-3 font-mono text-[9px] uppercase tracking-[0.14em] text-white/55">
-                    {item.subtitle}
-                  </p>
+                  <p data-program-scramble className="prog-panel-item mb-4 text-xs leading-relaxed text-slate-600">{item.desc}</p>
 
-                  <p className="prog-panel-item mb-5 text-xs leading-relaxed text-white/70">{item.desc}</p>
-
-                  <div className="prog-panel-item mb-5 space-y-1 border-t border-white/20 pt-3 font-mono text-[9px] uppercase tracking-widest text-white/60">
-                    <p>{item.time}</p>
-                    <p>{item.platform}</p>
-                    <p>{item.eligibility}</p>
+                  <div className="prog-panel-item mb-5 space-y-1 border-t border-slate-900/15 pt-3 font-mono text-[9px] uppercase tracking-widest text-slate-500">
+                    <p data-program-scramble>{item.time}</p>
+                    <p data-program-scramble>{item.platform}</p>
                   </div>
 
                   <div className="prog-panel-item">
                     <button
                       type="button"
                       onClick={onOpenRegister}
-                      className={`nav-angular-button inline-flex items-center gap-2 px-4 py-3 font-display text-[10px] font-bold uppercase tracking-widest transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white ${
+                      className={`nav-angular-button inline-flex items-center gap-2 px-4 py-3 font-display text-[10px] font-bold uppercase tracking-widest transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--color-secondary)] ${
                         item.isChallenge
                           ? 'bg-[#ff334b] text-[#1d0911] hover:bg-white'
                           : 'bg-(--color-primary) text-[#052126] hover:bg-(--color-electric-aqua)'

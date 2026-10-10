@@ -59,7 +59,7 @@ const App = () => {
   const audioRef = useRef(null);
 
   const [isLoading, setIsLoading] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true);
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [regType, setRegType] = useState('individual');
 
@@ -78,39 +78,11 @@ const App = () => {
     }
   }, [isLoading]);
 
-  // Attempt audible playback immediately. Browsers that block autoplay will
-  // retry from the first visitor interaction without changing the default UI.
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
     audio.volume = BACKGROUND_AUDIO_VOLUME;
-
-    const startAudio = async () => {
-      try {
-        audio.muted = false;
-        await audio.play();
-        removeInteractionListeners();
-      } catch {
-        // Autoplay may remain blocked until a later interaction.
-      }
-    };
-
-    const removeInteractionListeners = () => {
-      window.removeEventListener('pointerdown', startAudio);
-      window.removeEventListener('keydown', startAudio);
-      window.removeEventListener('touchstart', startAudio);
-      window.removeEventListener('scroll', startAudio);
-    };
-
-    startAudio();
-
-    window.addEventListener('pointerdown', startAudio, { passive: true });
-    window.addEventListener('keydown', startAudio);
-    window.addEventListener('touchstart', startAudio, { passive: true });
-    window.addEventListener('scroll', startAudio, { passive: true });
-
-    return removeInteractionListeners;
   }, []);
 
   const openRegister = (type = 'individual') => {
@@ -176,13 +148,13 @@ const App = () => {
 
   return (
     <div className="relative min-h-screen w-full overflow-x-clip bg-[var(--color-bg)] text-[var(--color-text)] selection:bg-[var(--color-primary)] selection:text-[#05090d]">
-      {/* Background ambience */}
+      {/* Background ambience starts only after the visitor activates it. */}
       <audio
         ref={audioRef}
         src={BACKGROUND_AUDIO_SRC}
         loop
-        autoPlay
-        preload="metadata"
+        muted
+        preload="none"
         onError={handleAudioError}
         aria-label="Ambient background audio"
       />
@@ -200,7 +172,6 @@ const App = () => {
         isMuted={isMuted}
         setIsMuted={handleSetMuted}
         audioAvailable={Boolean(BACKGROUND_AUDIO_SRC)}
-        showThemeToggle={false}
       />
 
       {/* Application routes */}

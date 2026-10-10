@@ -109,10 +109,8 @@ const AnimusGlobalBackground = () => {
         <img
           src={battlefieldBg}
           alt=""
-          className="h-full w-full scale-105 object-cover contrast-110 brightness-105 saturate-90"
+          className="h-full w-full scale-200 object-cover contrast-110 brightness-200 saturate-100"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)]/85 via-[var(--color-bg)]/35 to-[var(--color-bg)]/65" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-bg)]/55 via-transparent to-[var(--color-bg)]/55" />
       </div>
 
       <div
@@ -122,10 +120,8 @@ const AnimusGlobalBackground = () => {
         <img
           src={eagleVisionBg}
           alt=""
-          className="h-full w-full scale-105 object-cover contrast-110 brightness-105 saturate-95"
+          className="h-full w-full scale-105 object-cover contrast-110 brightness-200 saturate-95"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-bg)]/88 via-[var(--color-bg)]/30 to-[var(--color-bg)]/65" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[var(--color-bg)]/55 via-transparent to-[var(--color-bg)]/55" />
       </div>
 
       <div className="absolute inset-0 bg-cyber-grid opacity-10" />

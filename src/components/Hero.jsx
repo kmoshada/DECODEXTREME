@@ -18,8 +18,50 @@ import xtremeLogo from '../assets/IEEEXtreme 20.0 Color Logo (1).webp';
 const HERO_BACKGROUND_VIDEO_SRC =
   '/Hooded_character_gazing_at_city_20261007122346.mp4';
 const HERO_CHARACTER_IMAGE_SRC = '';
+const SCRAMBLE_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#$%&';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const scrambleText = (element, duration = 0.7) => {
+  if (!element) return null;
+
+  const finalText = element.textContent;
+  const letters = [...finalText];
+  const scrambledText = letters
+    .map((character) => (
+      character === ' '
+        ? ' '
+        : SCRAMBLE_CHARS[Math.floor(Math.random() * SCRAMBLE_CHARS.length)]
+    ))
+    .join('');
+  let lastRendered = '';
+
+  return gsap.to(element, {
+    duration,
+    ease: 'power2.out',
+    onStart: () => {
+      element.textContent = scrambledText;
+      lastRendered = scrambledText;
+    },
+    onUpdate: function updateScramble() {
+      const revealed = Math.floor(this.progress() * letters.length);
+      const nextText = letters
+        .map((character, index) => {
+          if (character === ' ') return ' ';
+          if (index < revealed || this.progress() === 1) return character;
+          return scrambledText[index];
+        })
+        .join('');
+      if (nextText !== lastRendered) {
+        element.textContent = nextText;
+        lastRendered = nextText;
+      }
+    },
+    onComplete: () => {
+      element.textContent = finalText;
+    },
+  });
+};
 
 const Hero = ({ loading, onOpenRegister }) => {
   const containerRef = useRef(null);
@@ -38,11 +80,15 @@ const Hero = ({ loading, onOpenRegister }) => {
     if (prefersReducedMotion) return undefined;
 
     const context = gsap.context(() => {
+      const isMobile = window.matchMedia('(max-width: 1023px)').matches;
       const timeline = gsap.timeline({
         defaults: { ease: 'power2.out', overwrite: 'auto' },
       });
       const titleLines = titleRef.current?.querySelectorAll(
         '[data-hero-title-line]',
+      );
+      const scrambleTargets = containerRef.current.querySelectorAll(
+        '[data-hero-scramble]',
       );
 
       const introGroups = [
@@ -64,31 +110,39 @@ const Hero = ({ loading, onOpenRegister }) => {
       timeline
         .fromTo(
           '.hero-kicker, .hero-index',
-          { y: 14 },
-          { y: 0, autoAlpha: 1, duration: 0.45 },
+          { y: isMobile ? 10 : 14 },
+          { y: 0, autoAlpha: 1, duration: isMobile ? 0.35 : 0.45 },
         )
         .fromTo(
           titleLines || [],
-          { y: 28 },
+          { y: isMobile ? 20 : 28 },
           {
             y: 0,
             autoAlpha: 1,
-            duration: 0.65,
-            stagger: 0.1,
+            duration: isMobile ? 0.5 : 0.65,
+            stagger: isMobile ? 0.07 : 0.1,
             ease: 'power3.out',
           },
           '-=0.2',
         )
         .fromTo(
           '.hero-subtitle, .hero-date-line, .hero-action-dock',
-          { y: 16 },
-          { y: 0, autoAlpha: 1, duration: 0.45, stagger: 0.08 },
+          { y: isMobile ? 12 : 16 },
+          { y: 0, autoAlpha: 1, duration: isMobile ? 0.35 : 0.45, stagger: isMobile ? 0.06 : 0.08 },
           '-=0.24',
+        )
+        .add(
+          () => {
+            scrambleTargets.forEach((target, index) => {
+              scrambleText(target, isMobile ? 0.5 + index * 0.08 : 0.65 + index * 0.1);
+            });
+          },
+          '-=0.18',
         )
         .fromTo(
           '.hero-stage',
-          { y: 20, scale: 0.97 },
-          { y: 0, scale: 1, autoAlpha: 1, duration: 0.7, ease: 'power2.out' },
+          { y: isMobile ? 12 : 20, scale: isMobile ? 0.99 : 0.97 },
+          { y: 0, scale: 1, autoAlpha: 1, duration: isMobile ? 0.5 : 0.7, ease: 'power2.out' },
           '-=0.38',
         )
         .fromTo(
@@ -228,15 +282,8 @@ const Hero = ({ loading, onOpenRegister }) => {
         <div className="bg-cyber-grid absolute inset-0 opacity-30" />
       </div>
 
-      <div className="content-rail hero-content relative z-10 grid min-h-0 flex-1 grid-cols-1 items-center gap-4 pb-10 pt-12 max-lg:pb-8 max-lg:pt-16 sm:pb-24 lg:grid-cols-[minmax(360px,1.05fr)_minmax(0,1.25fr)_minmax(180px,0.65fr)] lg:gap-8 lg:pb-28 lg:pt-20">
-        <div className="hero-copy relative z-20 min-w-0 max-w-xl lg:pb-8">
-          <div className="hero-kicker mb-4 inline-flex items-center gap-3 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--color-secondary)] sm:mb-6 sm:text-[10px] sm:tracking-[0.2em]">
-            <span className="h-px w-10 bg-[var(--color-primary)]" />
-            <span>IEEE PRE-XTREME / 20.0</span>
-          </div>
-          <div className="hero-index absolute -left-1 -top-10 hidden font-mono text-[10px] tracking-[0.2em] text-slate-400 lg:block">
-            01 <span className="text-[var(--color-primary)]">/</span> 04
-          </div>
+      <div className="content-rail hero-content relative z-10 grid min-h-0 flex-1 grid-cols-1 items-center gap-4 pb-10 pt-12 max-lg:min-h-[calc(100svh+3rem)] max-lg:items-start max-lg:pb-10 max-lg:pt-20 sm:max-lg:min-h-[calc(100svh+2rem)] sm:max-lg:pb-12 sm:max-lg:pt-24 lg:grid-cols-[minmax(360px,1.05fr)_minmax(0,1.25fr)_minmax(180px,0.65fr)] lg:gap-8 lg:pb-28 lg:pt-20">
+        <div className="hero-copy relative z-20 mt-[11rem] flex min-w-0 max-w-xl flex-col items-center text-center sm:max-lg:mt-[14rem] lg:mt-0 lg:items-start lg:text-left lg:pb-8">
           <div ref={titleRef}>
             <h1 id="hero-title" className="max-w-full font-display text-[clamp(3rem,15vw,5rem)] font-bold uppercase leading-[0.84] tracking-[-0.06em] text-[#081922] lg:text-[clamp(3.5rem,7vw,7.2rem)] lg:leading-[0.82] lg:tracking-[-0.08em]">
               <span className="block overflow-hidden py-1" data-hero-title-line>
@@ -246,14 +293,14 @@ const Hero = ({ loading, onOpenRegister }) => {
                 XTREME
               </span>
             </h1>
-            <p className="hero-subtitle mt-6 hidden max-w-[18rem] font-display text-[clamp(1rem,1.8vw,1.45rem)] font-semibold uppercase leading-[1.05] tracking-[0.08em] text-[var(--color-primary)] lg:block">
-              The Animus Initiation
+            <p className="hero-subtitle mt-6 hidden max-w-[20rem] font-display text-[clamp(1rem,1.8vw,1.45rem)] font-semibold uppercase leading-[1.05] tracking-[0.08em] text-[var(--color-primary)] lg:block">
+              <span data-hero-scramble>The Animus Initiation</span>
             </p>
           </div>
-          <div className="hero-date-line mt-5 max-w-sm border-l-2 border-[var(--color-primary)] pl-4 sm:mt-7">
+          <div className="hero-date-line mt-5 max-w-sm border-l-2 border-[var(--color-primary)] pl-4 text-left sm:mt-7">
             <p className="font-mono text-[10px] font-medium uppercase leading-[1.8] tracking-[0.12em] text-slate-600 sm:text-[11px]">
-              October 12–24, 2026<br />
-              Online · Sri Lanka{' '}
+              <span data-hero-scramble>October 12–24, 2026</span><br />
+              <span data-hero-scramble>Online · Sri Lanka</span>{' '}
               <span
                 className="ml-1 inline-flex translate-y-px items-center"
                 title="Sri Lanka"
@@ -280,7 +327,7 @@ const Hero = ({ loading, onOpenRegister }) => {
               </span>
             </p>
           </div>
-          <div className="hero-action-dock mt-8 flex flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap">
+          <div className="hero-action-dock mt-8 flex w-full max-w-sm flex-col gap-3 sm:mt-8 sm:flex-row sm:flex-wrap sm:justify-center lg:justify-start">
           <button
             type="button"
             onClick={onOpenRegister}
@@ -303,7 +350,7 @@ const Hero = ({ loading, onOpenRegister }) => {
           </div>
         </div>
 
-        <div className="hero-stage relative flex min-w-0 min-h-[390px] w-full items-center justify-center max-lg:pointer-events-none max-lg:absolute max-lg:right-[-8%] max-lg:top-12 max-lg:z-0 max-lg:h-[280px] max-lg:min-h-0 max-lg:w-[65%] max-lg:opacity-50 sm:max-lg:top-16 lg:col-span-2 lg:h-full lg:min-h-0">
+        <div className="hero-stage relative flex min-w-0 min-h-[390px] w-full items-center justify-center max-lg:pointer-events-none max-lg:absolute max-lg:right-[-18%] max-lg:top-8 max-lg:z-0 max-lg:h-[340px] max-lg:min-h-0 max-lg:w-[88%] max-lg:opacity-30 sm:max-lg:top-12 sm:max-lg:h-[400px] sm:max-lg:w-[84%] lg:col-span-2 lg:h-full lg:min-h-0">
           <div className="absolute inset-x-[5%] top-1/2 h-[78%] -translate-y-1/2 border border-[var(--color-secondary)]/20 bg-white/20 shadow-[0_24px_80px_rgba(8,25,34,0.08)] backdrop-blur-[2px]" />
           <div className="absolute left-[8%] top-[18%] hidden font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400 lg:block">
             Target / 20.0
@@ -316,7 +363,7 @@ const Hero = ({ loading, onOpenRegister }) => {
               className="relative z-10 max-h-[94%] w-auto object-contain drop-shadow-[0_22px_25px_rgba(8,25,34,0.25)]"
             />
           ) : (
-            <div className="relative z-10 flex h-[76%] w-[42%] max-w-[340px] min-w-[180px] items-center justify-center border border-dashed border-[var(--color-secondary)]/35 bg-[linear-gradient(180deg,rgba(8,126,135,0.08),rgba(255,255,255,0.52))] text-center shadow-[0_24px_40px_rgba(8,25,34,0.12)] max-lg:h-[92%] max-lg:w-[72%] max-lg:min-w-0">
+            <div className="relative z-10 flex h-[76%] w-[42%] max-w-[340px] min-w-[180px] items-center justify-center border border-dashed border-[var(--color-secondary)]/35 bg-[linear-gradient(180deg,rgba(8,126,135,0.08),rgba(255,255,255,0.52))] text-center shadow-[0_24px_40px_rgba(8,25,34,0.12)] max-lg:h-[88%] max-lg:w-[68%] max-lg:min-w-0">
               <div className="absolute inset-3 border border-[var(--color-primary)]/25" />
               <div className="relative hidden px-5 lg:block">
                 <Crosshair size={30} className="mx-auto mb-4 text-[var(--color-primary)]" strokeWidth={1.2} />
@@ -327,7 +374,7 @@ const Hero = ({ loading, onOpenRegister }) => {
           )}
         </div>
 
-        <aside className="hero-aside relative z-30 flex min-w-0 flex-col gap-3 bg-[var(--color-bg)]/70 max-lg:mb-6 max-lg:mt-16 max-lg:grid max-lg:grid-cols-3 max-lg:gap-2 max-lg:w-full max-lg:opacity-100 lg:absolute lg:right-6 lg:top-1/2 lg:w-[200px] lg:-translate-y-1/2 lg:bg-transparent lg:pb-0 xl:right-8 xl:w-[230px]">
+        <aside className="hero-aside relative z-30 hidden min-w-0 flex-col gap-3 bg-[var(--color-bg)]/70 lg:flex lg:absolute lg:right-6 lg:top-1/2 lg:w-[200px] lg:-translate-y-1/2 lg:bg-transparent lg:pb-0 xl:right-8 xl:w-[230px]">
           <div className="col-span-3 mb-0 flex items-center justify-between border-b border-slate-900/10 pb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400 lg:mb-2 lg:pb-3">
             <span>Field dossier</span>
             <span className="text-[var(--color-primary)]">Live</span>
@@ -350,7 +397,7 @@ const Hero = ({ loading, onOpenRegister }) => {
       </div>
 
       {/* Organizer ribbon */}
-      <div className="hero-organizer relative z-10 mt-auto px-4 py-4 backdrop-blur-md sm:px-6 sm:py-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0">
+      <div className="hero-organizer relative z-10 mt-1 border-t border-slate-900/10 bg-white/45 px-4 py-5 backdrop-blur-md sm:mt-10 sm:px-6 sm:py-5 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0 lg:border-t-0 lg:bg-transparent">
         <div className="content-rail flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6">
           <div className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.13em] text-slate-500 sm:text-xs">
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]" aria-hidden="true" />
