@@ -193,7 +193,7 @@ const App = () => {
         <Preloader onComplete={handlePreloaderComplete} />
       )}
 
-      {/* <AnimusGlobalBackground /> */}
+      <AnimusGlobalBackground />
 
       {/* Navigation: light theme, no theme toggle */}
       <Navbar
