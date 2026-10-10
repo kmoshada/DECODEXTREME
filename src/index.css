@@ -280,12 +280,11 @@
 
 @layer components {
   .about-section {
-    min-height: 100svh;
-    display: flex;
+    padding-block: clamp(4rem, 10vh, 8rem);
   }
 
   .about-section > .content-rail {
-    padding-block: clamp(2.5rem, 8vh, 7rem);
+    padding-block: 0;
   }
 
   .about-section-header {
@@ -298,6 +297,28 @@
 
   .about-section-grid > .about-header-anim {
     min-width: 0;
+  }
+
+  @media (min-width: 1024px) {
+    .about-section {
+      min-height: 320svh;
+      padding-block: clamp(6rem, 14vh, 12rem);
+    }
+
+    .about-stage {
+      max-width: 52rem;
+      row-gap: clamp(8rem, 20vh, 16rem);
+    }
+
+    .about-stage > .about-dossier,
+    .about-stage-tracks {
+      grid-column: 1;
+    }
+
+    .about-stage-tracks {
+      display: grid;
+      gap: clamp(8rem, 18vh, 14rem);
+    }
   }
 
   .content-rail {

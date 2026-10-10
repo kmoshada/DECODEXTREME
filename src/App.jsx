@@ -121,7 +121,9 @@ const App = () => {
 
   const handlePreloaderComplete = () => {
     setIsLoading(false);
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => ScrollTrigger.refresh(true));
+    });
   };
 
   // Handles both boolean values and functional state updates from Navbar.

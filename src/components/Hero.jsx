@@ -7,6 +7,7 @@ import {
   ShieldCheck,
 } from 'lucide-react';
 import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 import heroImage from '../assets/hero.png';
 import sbLogo from '../assets/sb-logo-color.webp';
@@ -17,6 +18,8 @@ import xtremeLogo from '../assets/IEEEXtreme 20.0 Color Logo (1).webp';
 const HERO_BACKGROUND_VIDEO_SRC =
   '/Hooded_character_gazing_at_city_20261007122346.mp4';
 const HERO_CHARACTER_IMAGE_SRC = '';
+
+gsap.registerPlugin(ScrollTrigger);
 
 const Hero = ({ loading, onOpenRegister }) => {
   const containerRef = useRef(null);
@@ -120,6 +123,8 @@ const Hero = ({ loading, onOpenRegister }) => {
         ease: 'none',
         repeat: -1,
       });
+
+      ScrollTrigger.refresh();
     }, containerRef);
 
     return () => context.revert();
