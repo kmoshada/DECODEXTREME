@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { MoveRight, Shield, Video, Code2, Users, Trophy, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { MoveRight, Video, Code2, Users, Trophy, CheckCircle2 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,15 +22,16 @@ const ServicesSection = ({ onOpenRegister }) => {
         }
       });
 
-      gsap.from(".prog-card-anim", {
-        y: 50,
+      gsap.from(".prog-panel-anim", {
+        y: 80,
         autoAlpha: 0,
-        duration: 0.8,
-        stagger: 0.12,
-        ease: "power2.out",
+        duration: 1,
+        stagger: 0.14,
+        ease: "power3.out",
         scrollTrigger: {
-          trigger: ".prog-grid",
+          trigger: ".prog-panels",
           start: "top 80%",
+          once: true,
         }
       });
     }, sectionRef);
@@ -50,6 +51,8 @@ const ServicesSection = ({ onOpenRegister }) => {
       platform: 'Zoom Online',
       eligibility: 'Open to Everyone Worldwide',
       icon: Video,
+      image: '',
+      imageLabel: 'BACKGROUND IMAGE / AWARENESS',
       accent: 'var(--color-primary)',
       isChallenge: false
     },
@@ -64,6 +67,8 @@ const ServicesSection = ({ onOpenRegister }) => {
       platform: 'Zoom Online',
       eligibility: 'Open to Everyone Worldwide',
       icon: Code2,
+      image: '',
+      imageLabel: 'BACKGROUND IMAGE / FUNDAMENTALS',
       accent: 'var(--color-primary)',
       isChallenge: false
     },
@@ -78,6 +83,8 @@ const ServicesSection = ({ onOpenRegister }) => {
       platform: 'Zoom Online',
       eligibility: 'Open to Everyone Worldwide',
       icon: Users,
+      image: '',
+      imageLabel: 'BACKGROUND IMAGE / STRATEGY',
       accent: 'var(--color-primary)',
       isChallenge: false
     },
@@ -92,6 +99,8 @@ const ServicesSection = ({ onOpenRegister }) => {
       platform: 'HackerRank Arena',
       eligibility: 'SLTC Undergraduates Only (Teams of 3)',
       icon: Trophy,
+      image: '',
+      imageLabel: 'BACKGROUND IMAGE / PREXTREME',
       accent: '#ff334b',
       isChallenge: true
     }
@@ -101,120 +110,103 @@ const ServicesSection = ({ onOpenRegister }) => {
     <section
       id="program"
       ref={sectionRef}
-      className="relative w-full py-28 px-6 md:px-12 bg-transparent text-white overflow-hidden border-b border-white/10"
+      className="relative w-full py-28 bg-transparent text-white overflow-hidden border-b border-white/10"
     >
       <div className="absolute inset-0 bg-cyber-grid pointer-events-none opacity-30" />
-      <div className="absolute bottom-10 left-10 w-96 h-96 bg-[var(--color-primary)]/5 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 h-96 w-96 rounded-full bg-(--color-primary)/5 blur-[140px] pointer-events-none" />
 
-      <div className="max-w-7xl mx-auto relative z-10">
+      <div className="content-rail relative z-10">
         
-        {/* CodeSprint Signature Section Header */}
-        <div className="section-header">
-          <div className="section-label prog-header-anim">
-            <span>PROGRAM &amp; REGISTRATION // FOUR PHASES</span>
+        <div className="prog-header mb-10 text-left sm:mb-14">
+          <div className="prog-header-anim mb-4 inline-flex items-center gap-3 font-mono text-[9px] font-bold uppercase tracking-[0.18em] text-(--color-secondary) sm:text-[10px]">
+            <span className="h-px w-10 bg-(--color-primary)" />
+            <span>PROGRAM // FOUR PHASES</span>
           </div>
 
-          <div className="section-heading-wrap prog-header-anim">
-            <span className="section-heading-outline">CHOOSE YOUR PATH</span>
-            <span className="section-heading-italic">Program &amp; Challenges</span>
-          </div>
+          <h2 className="prog-heading prog-header-anim max-w-4xl font-display text-[clamp(3.8rem,12vw,8rem)] font-bold uppercase leading-[0.8] tracking-[-0.08em] text-[#081922]">
+            <span className="block">THE</span>
+            <span className="block text-(--color-secondary)">PROGRAM</span>
+          </h2>
 
-          <p className="section-subtext prog-header-anim">
-            THREE OPEN SESSIONS AND ONE SLTC TEAM CHALLENGE · FREE PARTICIPATION
+          <p className="prog-header-anim mt-6 max-w-xl border-l-2 border-(--color-primary) pl-4 font-mono text-[10px] font-medium uppercase leading-[1.7] tracking-[0.12em] text-slate-600 sm:mt-8 sm:text-[11px]">
+            FOUR PHASES · ONE FINAL CHALLENGE · FREE TO JOIN
           </p>
         </div>
 
-        {/* Sessions Grid */}
-        <div className="prog-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        {/* Editorial panel layout. Replace each image placeholder with a background asset when available. */}
+        <div className="prog-panels grid grid-cols-1 gap-px border border-white/15 bg-white/15 sm:grid-cols-2 md:grid-cols-4">
           {sessions.map((item) => {
             const Icon = item.icon;
             return (
               <div
                 key={item.id}
-                className={`prog-card-anim animus-card p-6 md:p-8 flex flex-col justify-between group hover:-translate-y-2 transition-all duration-300 hud-bracket ${
+                className={`prog-panel-anim group relative flex min-h-128 flex-col justify-end overflow-hidden bg-[#dde8eb] p-5 transition-colors duration-500 sm:min-h-144 lg:min-h-156 ${
                   item.isChallenge
-                    ? 'border-red-500/30 bg-gradient-to-b from-red-950/20 to-black/60 shadow-[0_0_30px_rgba(255,51,75,0.1)]'
+                    ? 'bg-[#28151a]'
                     : ''
                 }`}
               >
-                <div>
-                  {/* Top Bar with Number & Badge */}
-                  <div className="flex items-center justify-between mb-6">
-                    <span className="font-mono text-3xl font-black text-white/40 group-hover:text-[var(--color-primary)] transition-colors">
-                      {item.num}
-                    </span>
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wider uppercase border ${
-                      item.isChallenge
-                        ? 'border-red-500/40 text-red-400 bg-red-500/10'
-                        : 'border-[var(--color-primary)]/30 text-[var(--color-primary)] bg-[var(--color-primary)]/10'
-                    }`}>
-                      {item.date}
-                    </span>
+                {item.image && (
+                  <img
+                    src={item.image}
+                    alt=""
+                    aria-hidden="true"
+                    className="absolute inset-0 h-full w-full object-cover opacity-60 transition-transform duration-700 group-hover:scale-110"
+                  />
+                )}
+                <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,20,24,0.08)_18%,rgba(5,20,24,0.88)_88%)] transition-opacity duration-500 group-hover:opacity-75" />
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_65%_20%,rgba(8,209,216,0.24),transparent_34%),linear-gradient(135deg,rgba(255,255,255,0.1),transparent_55%)] opacity-75 transition-transform duration-700 group-hover:scale-110" />
+                <div className="absolute inset-4 border border-white/20 transition-all duration-500 group-hover:inset-3 group-hover:border-(--color-primary)/70" />
+                <div className="absolute left-5 top-5 right-5 flex items-center justify-between font-mono text-[9px] uppercase tracking-[0.16em] text-white/60">
+                  <span>{item.imageLabel}</span>
+                  <span>{item.num}</span>
+                </div>
+                {!item.image && (
+                  <div className="absolute left-1/2 top-1/3 -translate-x-1/2 text-center font-mono text-[9px] uppercase tracking-[0.2em] text-white/35">
+                    <div className="mx-auto mb-3 h-px w-12 bg-white/40" />
+                    Image placeholder
                   </div>
+                )}
 
-                  {/* Icon & Subtitle */}
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-white group-hover:scale-110 transition-transform">
-                      <Icon size={18} />
-                    </div>
-                    <span className="text-[11px] font-mono tracking-widest text-gray-400 uppercase">
-                      {item.subtitle}
-                    </span>
+                <div className="relative z-10">
+                  <div className="mb-3 flex items-center gap-2">
+                    <Icon size={16} className={item.isChallenge ? 'text-red-300' : 'text-(--color-primary)'} />
+                    <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-white/65">{item.date}</span>
                   </div>
-
-                  {/* Title */}
-                  <h3 className="font-display text-2xl font-bold text-white mb-3 group-hover:text-[var(--color-primary)] transition-colors">
+                  <h3 className="mb-3 font-display text-2xl font-bold uppercase leading-[0.92] text-white transition-colors duration-300 group-hover:text-(--color-electric-aqua)">
                     {item.title}
                   </h3>
-
-                  {/* Description */}
-                  <p className="text-gray-400 text-xs md:text-sm leading-relaxed mb-6">
-                    {item.desc}
-                  </p>
-                </div>
-
-                {/* Bottom Meta & Action */}
-                <div className="space-y-4 pt-4 border-t border-white/10">
-                  <div className="font-mono text-[11px] space-y-1 text-gray-400">
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">FORMAT:</span>
-                      <span className="text-white">{item.platform}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-500">AUDIENCE:</span>
-                      <span className={item.isChallenge ? 'text-red-400 font-semibold' : 'text-emerald-400'}>
-                        {item.isChallenge ? 'SLTC Only' : 'Everyone'}
-                      </span>
-                    </div>
+                  <p className="mb-5 text-xs leading-relaxed text-white/65">{item.desc}</p>
+                  <div className="mb-5 border-t border-white/20 pt-3 font-mono text-[9px] uppercase tracking-widest text-white/55">
+                    <p>{item.platform}</p>
+                    <p className="mt-1">{item.eligibility}</p>
                   </div>
-
                   <button
                     onClick={onOpenRegister}
-                    className={`w-full py-3 rounded-full font-display font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    className={`nav-angular-button inline-flex items-center gap-2 px-4 py-3 font-display text-[10px] font-bold uppercase tracking-widest transition-colors ${
                       item.isChallenge
-                        ? 'bg-[#ff334b] text-white hover:bg-red-600 shadow-[0_0_20px_rgba(255,51,75,0.4)]'
-                        : 'bg-white/10 hover:bg-[var(--color-primary)] hover:text-black text-white'
+                        ? 'bg-[#ff334b] text-white hover:bg-red-600'
+                        : 'bg-(--color-primary) text-[#052126] hover:bg-(--color-electric-aqua)'
                     }`}
                   >
-                    <span>{item.isChallenge ? 'Register Team' : 'Enroll Session'}</span>
+                    <span>{item.isChallenge ? 'Register team' : 'Enroll session'}</span>
                     <MoveRight size={14} />
                   </button>
                 </div>
-
               </div>
             );
           })}
         </div>
 
         {/* Resources & Preparation Footnote Bar */}
-        <div className="p-6 rounded-2xl bg-white/[0.02] border border-white/10 flex flex-col md:flex-row items-center justify-between gap-6 font-mono text-xs text-gray-400">
+        <div className="mt-8 flex flex-col items-center justify-between gap-6 border border-white/10 bg-white/2 p-6 font-mono text-xs text-gray-400 md:flex-row">
           <div className="flex items-center gap-3">
-            <CheckCircle2 size={16} className="text-[var(--color-primary)]" />
+            <CheckCircle2 size={16} className="text-(--color-primary)" />
             <span>Preparation guidelines, session slides, and HackerRank sample questions will be shared with registered delegates.</span>
           </div>
           <button
             onClick={() => document.getElementById('guide')?.scrollIntoView({ behavior: 'smooth' })}
-            className="text-[var(--color-primary)] hover:underline whitespace-nowrap"
+            className="text-(--color-primary) hover:underline whitespace-nowrap"
           >
             Read Delegate Guide →
           </button>

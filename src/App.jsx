@@ -38,9 +38,9 @@ const Home = ({ isLoading, onOpenRegister }) => (
 
     <AboutSection />
 
-    <TimelineSection
+    {/* <TimelineSection
       onOpenRegister={() => onOpenRegister('individual')}
-    />
+    /> */}
 
     <ServicesSection
       onOpenRegister={() => onOpenRegister('individual')}

@@ -101,7 +101,7 @@ const Navbar = ({
               : 'border-slate-900/[0.06]',
           ].join(' ')}
         >
-          <div className="mx-auto flex min-h-[60px] w-full max-w-7xl items-center justify-between gap-1.5 px-3 sm:min-h-[68px] sm:gap-3 sm:px-6 lg:min-h-[76px] lg:px-10">
+          <div className="content-rail flex min-h-[60px] items-center justify-between gap-1.5 sm:min-h-[68px] sm:gap-3 lg:min-h-[76px]">
             {/* Brand */}
             <Link
               to="/"

@@ -217,7 +217,7 @@ const Hero = ({ loading, onOpenRegister }) => {
         <div className="bg-cyber-grid absolute inset-0 opacity-30" />
       </div>
 
-      <div className="hero-content relative z-10 mx-auto grid min-h-0 w-full max-w-[1440px] flex-1 grid-cols-1 items-center gap-6 px-5 pb-10 pt-12 max-lg:pt-20 sm:px-8 sm:pb-24 lg:grid-cols-[minmax(360px,1.05fr)_minmax(0,1.25fr)_minmax(180px,0.65fr)] lg:gap-8 lg:px-12 lg:pb-28 lg:pt-20">
+      <div className="content-rail hero-content relative z-10 grid min-h-0 flex-1 grid-cols-1 items-center gap-4 pb-10 pt-12 max-lg:pb-8 max-lg:pt-16 sm:pb-24 lg:grid-cols-[minmax(360px,1.05fr)_minmax(0,1.25fr)_minmax(180px,0.65fr)] lg:gap-8 lg:pb-28 lg:pt-20">
         <div className="hero-copy relative z-20 min-w-0 max-w-xl lg:pb-8">
           <div className="hero-kicker mb-4 inline-flex items-center gap-3 font-mono text-[9px] font-bold uppercase tracking-[0.16em] text-[var(--color-secondary)] sm:mb-6 sm:text-[10px] sm:tracking-[0.2em]">
             <span className="h-px w-10 bg-[var(--color-primary)]" />
@@ -316,7 +316,7 @@ const Hero = ({ loading, onOpenRegister }) => {
           )}
         </div>
 
-        <aside className="hero-aside relative z-30 flex min-w-0 flex-col gap-3 bg-[var(--color-bg)]/70 max-lg:mb-6 max-lg:mt-[45vh] max-lg:grid max-lg:grid-cols-3 max-lg:gap-2 max-lg:w-full max-lg:opacity-100 lg:absolute lg:right-6 lg:top-1/2 lg:w-[200px] lg:-translate-y-1/2 lg:bg-transparent lg:pb-0 xl:right-8 xl:w-[230px]">
+        <aside className="hero-aside relative z-30 flex min-w-0 flex-col gap-3 bg-[var(--color-bg)]/70 max-lg:mb-6 max-lg:mt-6 max-lg:grid max-lg:grid-cols-3 max-lg:gap-2 max-lg:w-full max-lg:opacity-100 lg:absolute lg:right-6 lg:top-1/2 lg:w-[200px] lg:-translate-y-1/2 lg:bg-transparent lg:pb-0 xl:right-8 xl:w-[230px]">
           <div className="col-span-3 mb-0 flex items-center justify-between border-b border-slate-900/10 pb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400 lg:mb-2 lg:pb-3">
             <span>Field dossier</span>
             <span className="text-[var(--color-primary)]">Live</span>
@@ -339,8 +339,8 @@ const Hero = ({ loading, onOpenRegister }) => {
       </div>
 
       {/* Organizer ribbon */}
-      <div className="hero-organizer relative z-10 mt-auto border-t border-slate-900/10 bg-white/75 px-4 py-4 backdrop-blur-md sm:px-6 sm:py-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0">
-        <div className="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6">
+      <div className="hero-organizer relative z-10 mt-auto px-4 py-4 backdrop-blur-md sm:px-6 sm:py-4 lg:absolute lg:inset-x-0 lg:bottom-0 lg:mt-0">
+        <div className="content-rail flex flex-col items-center justify-between gap-4 sm:flex-row sm:gap-6">
           <div className="flex items-center gap-2 font-mono text-[10px] font-medium uppercase tracking-[0.13em] text-slate-500 sm:text-xs">
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--color-primary)]" aria-hidden="true" />
             <span>Organized by</span>
