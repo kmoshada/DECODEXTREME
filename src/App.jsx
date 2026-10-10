@@ -6,7 +6,7 @@ import AnimusGlobalBackground from './components/AnimusGlobalBackground';
 import AboutSection from './components/AboutSection';
 import HistorySection from './components/HistorySection';
 import ServicesSection from './components/ServicesSection';
-import TimelineSection from './components/TimelineSection';
+import TimelineFullscreenMap from './components/TimelineFullscreenMap';
 import PrizesSection from './components/PrizesSection';
 import GuidelinesSection from './components/GuidelinesSection';
 import ContactSection from './components/ContactSection';
@@ -28,7 +28,7 @@ const Home = ({ isLoading, onOpenRegister }) => {
     <>
       <Hero loading={isLoading} onOpenRegister={() => onOpenRegister('individual')} />
       <AboutSection />
-      <TimelineSection onOpenRegister={() => onOpenRegister('individual')} />
+      <TimelineFullscreenMap onOpenRegister={() => onOpenRegister('individual')} />
       <ServicesSection onOpenRegister={() => onOpenRegister('individual')} />
       <PrizesSection />
       <GuidelinesSection />
