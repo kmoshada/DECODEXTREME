@@ -32,9 +32,9 @@ html[data-theme="light"] .timeline-fullscreen {
 
 /* Map Image - Kept pure, natural Ice White background */
 .map-fullscreen-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  width: 90%;
+  height: 80%;
+  object-fit: contain;
   object-position: center;
   filter: none !important;
   mix-blend-mode: normal !important;
