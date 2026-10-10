@@ -1,17 +1,17 @@
-/* Fullscreen Tactical Mission Map Styles (White Background) */
+/* Fullscreen Tactical Mission Map Styles (Ice White #F4FAFB Background) */
 
 .timeline-fullscreen {
   position: relative;
-  background-color: #ffffff;
-  min-height: 100vh;
-  min-height: 100dvh;
+  background-color: #F4FAFB;
+  min-height: 80vh;
+  min-height: 80dvh;
   width: 100%;
   overflow: hidden;
   color: #090d16;
 }
 
 html[data-theme="light"] .timeline-fullscreen {
-  background-color: #ffffff;
+  background-color: #F4FAFB;
   color: #090d16;
 }
 
@@ -21,7 +21,7 @@ html[data-theme="light"] .timeline-fullscreen {
   inset: -5%;
   width: 110%;
   height: 110%;
-  background-color: #ffffff;
+  background-color: #F4FAFB;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -30,7 +30,7 @@ html[data-theme="light"] .timeline-fullscreen {
   will-change: transform;
 }
 
-/* Map Image - Kept pure, natural white background */
+/* Map Image - Kept pure, natural Ice White background */
 .map-fullscreen-image {
   width: 100%;
   height: 100%;
@@ -39,27 +39,28 @@ html[data-theme="light"] .timeline-fullscreen {
   filter: none !important;
   mix-blend-mode: normal !important;
   opacity: 1 !important;
-  background-color: #ffffff;
+  background-color: #F4FAFB;
   user-select: none;
   pointer-events: none;
 }
 
-/* Subtle border vignettes for clean section transition without darkening the white map */
+/* Subtle border vignettes for clean section transition with Ice White map */
 .white-map-vignette {
-  background: radial-gradient(
-    ellipse at center,
-    transparent 55%,
-    rgba(255, 255, 255, 0.4) 80%,
-    rgba(255, 255, 255, 0.85) 100%
-  );
+  background: radial-gradient(ellipse at center,
+      transparent 55%,
+      rgba(244, 250, 251, 0.4) 80%,
+      rgba(244, 250, 251, 0.9) 100%);
   pointer-events: none;
 }
 
 /* Pulsing Active Pin Beacon Glow */
 @keyframes pulseBeaconCyan {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 16px rgba(0, 242, 254, 0.7), 0 0 30px rgba(0, 139, 153, 0.4);
   }
+
   50% {
     box-shadow: 0 0 30px rgba(0, 242, 254, 1), 0 0 50px rgba(0, 139, 153, 0.6);
   }
@@ -74,6 +75,7 @@ html[data-theme="light"] .timeline-fullscreen {
   0% {
     stroke-dashoffset: 40;
   }
+
   100% {
     stroke-dashoffset: 0;
   }
