@@ -104,25 +104,31 @@ const Hero = ({ loading, onOpenRegister }) => {
           '-=0.28',
         );
 
-      gsap.fromTo(
-        '.hero-scan-line',
-        { xPercent: -100, autoAlpha: 0.15 },
-        {
-          xPercent: 100,
-          autoAlpha: 0.65,
-          duration: 3.2,
+      const scanLine = containerRef.current.querySelector('.hero-scan-line');
+      if (scanLine) {
+        gsap.fromTo(
+          scanLine,
+          { xPercent: -100, autoAlpha: 0.15 },
+          {
+            xPercent: 100,
+            autoAlpha: 0.65,
+            duration: 3.2,
+            ease: 'none',
+            repeat: -1,
+            repeatDelay: 1.2,
+          },
+        );
+      }
+
+      const orbit = containerRef.current.querySelector('.hero-orbit');
+      if (orbit) {
+        gsap.to(orbit, {
+          rotate: 360,
+          duration: 26,
           ease: 'none',
           repeat: -1,
-          repeatDelay: 1.2,
-        },
-      );
-
-      gsap.to('.hero-orbit', {
-        rotate: 360,
-        duration: 26,
-        ease: 'none',
-        repeat: -1,
-      });
+        });
+      }
 
       ScrollTrigger.refresh();
     }, containerRef);
@@ -321,7 +327,7 @@ const Hero = ({ loading, onOpenRegister }) => {
           )}
         </div>
 
-        <aside className="hero-aside relative z-30 flex min-w-0 flex-col gap-3 bg-[var(--color-bg)]/70 max-lg:mb-6 max-lg:mt-6 max-lg:grid max-lg:grid-cols-3 max-lg:gap-2 max-lg:w-full max-lg:opacity-100 lg:absolute lg:right-6 lg:top-1/2 lg:w-[200px] lg:-translate-y-1/2 lg:bg-transparent lg:pb-0 xl:right-8 xl:w-[230px]">
+        <aside className="hero-aside relative z-30 flex min-w-0 flex-col gap-3 bg-[var(--color-bg)]/70 max-lg:mb-6 max-lg:mt-16 max-lg:grid max-lg:grid-cols-3 max-lg:gap-2 max-lg:w-full max-lg:opacity-100 lg:absolute lg:right-6 lg:top-1/2 lg:w-[200px] lg:-translate-y-1/2 lg:bg-transparent lg:pb-0 xl:right-8 xl:w-[230px]">
           <div className="col-span-3 mb-0 flex items-center justify-between border-b border-slate-900/10 pb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-slate-400 lg:mb-2 lg:pb-3">
             <span>Field dossier</span>
             <span className="text-[var(--color-primary)]">Live</span>

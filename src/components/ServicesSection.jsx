@@ -142,7 +142,24 @@ const buildPanelsScrubbed = (section, q) => {
     },
   });
 
-  q('.prog-panel').forEach((panel, i) => master.add(revealPanel(panel), i * 0.2));
+  q('.prog-panel').forEach((panel, i) => {
+    const at = i * 0.2;
+    const items = panel.querySelectorAll('.prog-panel-item');
+
+    master
+      .fromTo(
+        panel,
+        { clipPath: CLIP_HIDDEN, y: 48 },
+        { clipPath: CLIP_SHOWN, y: 0, duration: 0.9, ease: 'power4.inOut' },
+        at,
+      )
+      .fromTo(
+        items,
+        { autoAlpha: 0, y: 24 },
+        { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.07 },
+        at + 0.35,
+      );
+  });
 };
 
 // TABLET / MOBILE: each panel reveals as it enters and reverses when scrolled back up.
@@ -334,7 +351,7 @@ const ServicesSection = ({ onOpenRegister }) => {
         </div>
 
         {/* Resources & preparation footnote */}
-        <div className="prog-footnote mt-8 flex flex-col items-start justify-between gap-6 border border-slate-900/10 bg-white/70 p-6 font-mono text-xs text-slate-600 md:flex-row md:items-center">
+        <div className="prog-footnote mt-8 flex flex-col items-start justify-between gap-6 p-6 font-mono text-xs text-slate-600 md:flex-row md:items-center">
           <div className="flex items-start gap-3">
             <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-(--color-secondary)" aria-hidden="true" />
             <span>

@@ -12,7 +12,6 @@ import PrizesSection from './components/PrizesSection';
 import GuidelinesSection from './components/GuidelinesSection';
 import ContactSection from './components/ContactSection';
 import Footer from './components/Footer';
-import ScrollIndicator from './components/ScrollIndicator';
 import Preloader from './components/Preloader';
 import RegistrationModal from './components/RegistrationModal';
 import AnimusGlobalBackground from './components/AnimusGlobalBackground';
@@ -122,7 +121,7 @@ const App = () => {
   const handlePreloaderComplete = () => {
     setIsLoading(false);
     requestAnimationFrame(() => {
-      requestAnimationFrame(() => ScrollTrigger.refresh(true));
+      ScrollTrigger.refresh(true);
     });
   };
 
@@ -260,8 +259,6 @@ const App = () => {
         defaultType={regType}
       />
 
-      {/* Scroll position indicator */}
-      <ScrollIndicator />
     </div>
   );
 };

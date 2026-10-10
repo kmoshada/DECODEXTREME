@@ -221,17 +221,17 @@ const Preloader = ({ onComplete }) => {
         }, '<+0.1')
         .to(wipeRef.current, {
           opacity: 0.95,
-          duration: 0.2,
+          duration: 0.12,
           ease: 'power2.in'
-        }, '-=0.1')
+        }, '-=0.08')
         .to(containerRef.current, {
           opacity: 0,
-          duration: 0.4,
+          duration: 0.16,
           ease: 'power2.out',
-          onComplete: () => {
+          onStart: () => {
             if (onComplete) onComplete();
           }
-        }, '<+0.15');
+        }, '<');
     };
 
     // Store finish handler on container for Skip button

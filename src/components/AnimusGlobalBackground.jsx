@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -7,43 +7,12 @@ import eagleVisionBg from '../assets/animus-eaglevision-bg.jpg';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const SEQUENCE_NAMES = [
-  'SEQ 01 // BATTLEFIELD INITIATION',
-  'SEQ 02 // THE BROTHERHOOD CREED',
-  'SEQ 03 // EAGLE VISION TIMELINE',
-  'SEQ 04 // CHOOSE YOUR PATH',
-  'SEQ 05 // CHAMPION RECOGNITION',
-  'SEQ 06 // DELEGATE CODEX',
-  'SEQ 07 // ARCHIVE COMPLETE',
-];
-
 const AnimusGlobalBackground = () => {
   const battlefieldRef = useRef(null);
   const eagleVisionRef = useRef(null);
   const crestRef = useRef(null);
-  const [syncProgress, setSyncProgress] = useState(0);
-  const [activeSeq, setActiveSeq] = useState(0);
-
   useEffect(() => {
     const context = gsap.context(() => {
-      const updateTelemetry = (progress) => {
-        setSyncProgress(Math.round(progress * 100));
-        setActiveSeq(
-          Math.min(
-            SEQUENCE_NAMES.length - 1,
-            Math.floor(progress * SEQUENCE_NAMES.length),
-          ),
-        );
-      };
-
-      ScrollTrigger.create({
-        trigger: document.documentElement,
-        start: 'top top',
-        end: 'bottom bottom',
-        scrub: 0.8,
-        onUpdate: ({ progress }) => updateTelemetry(progress),
-      });
-
       gsap.to(battlefieldRef.current, {
         yPercent: 14,
         scale: 1.08,
@@ -181,12 +150,6 @@ const AnimusGlobalBackground = () => {
         </svg>
       </div>
 
-      <div className="fixed bottom-4 left-4 z-[60] hidden items-center gap-3 rounded-full border border-slate-900/10 bg-white/75 px-3.5 py-2 font-mono text-[10px] tracking-widest text-slate-600 backdrop-blur-md lg:flex">
-        <span className="h-2 w-2 animate-pulse rounded-full bg-[var(--color-primary)]" />
-        <span className="font-bold text-slate-800">{SEQUENCE_NAMES[activeSeq]}</span>
-        <span className="text-slate-300">|</span>
-        <span className="text-[var(--color-secondary)]">SYNC: {syncProgress}%</span>
-      </div>
     </div>
   );
 };
